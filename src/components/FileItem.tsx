@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { File, Folder } from 'lucide-react';
 import { FileItem as FileItemType } from '@/types/FileSystem';
 import { cn } from '@/lib/utils';
@@ -26,6 +26,13 @@ export const FileItemComponent = ({
   onDrop,
 }: FileItemProps) => {
   const [editName, setEditName] = useState(item.name);
+  
+  // Update editName when item changes or when isEditing becomes true
+  useEffect(() => {
+    if (isEditing) {
+      setEditName(item.name);
+    }
+  }, [item.name, isEditing]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -47,20 +54,37 @@ export const FileItemComponent = ({
     if (item.type === 'folder') {
       e.preventDefault();
       e.stopPropagation();
-      const data = JSON.parse(e.dataTransfer.getData('application/json'));
-      onDrop(item.id, data.itemIds);
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('application/json'));
+        onDrop(item.id, data.itemIds);
+      } catch (error) {
+        console.error('Error parsing drag data:', error);
+      }
     }
   };
+
+  // Determine if the item is an image file for potential preview
+  const isImageFile = item.type === 'file' && 
+    item.extension && 
+    ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(item.extension.toLowerCase());
+  
+  const isPdfFile = item.type === 'file' && 
+    item.extension && 
+    item.extension.toLowerCase() === 'pdf';
 
   return (
     <div
       className={cn(
-        "flex flex-col items-center p-3 m-1 rounded-lg cursor-pointer select-none transition-colors",
+        "flex flex-col items-center p-3 m-1 rounded-lg cursor-pointer select-none transition-colors group",
         "hover:bg-blue-50 hover:border-blue-200",
         isSelected && "bg-blue-100 border-blue-300",
-        "border border-transparent"
+        "border border-transparent",
+        (isImageFile || isPdfFile) && "hover:shadow-md"
       )}
-      onClick={(e) => onSelect(item.id, e.ctrlKey)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(item.id, e.ctrlKey);
+      }}
       onDoubleClick={() => onDoubleClick(item)}
       draggable={!isEditing}
       onDragStart={(e) => onDragStart(e, [item.id])}
@@ -80,13 +104,14 @@ export const FileItemComponent = ({
           type="text"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
-          onKeyDown={handleKeyDown}
           onBlur={() => onRename(item.id, editName)}
-          className="text-center text-sm bg-white border rounded px-1 py-0.5 w-20"
+          onKeyDown={handleKeyDown}
+          className="text-center text-sm bg-white border rounded px-1 py-0.5 w-full"
           autoFocus
+          onClick={(e) => e.stopPropagation()}
         />
       ) : (
-        <span className="text-sm text-center break-words w-20">
+        <span className="text-sm text-center break-words w-full">
           {item.name}
         </span>
       )}

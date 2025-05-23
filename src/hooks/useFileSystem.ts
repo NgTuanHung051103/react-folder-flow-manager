@@ -43,6 +43,40 @@ export const useFileSystem = () => {
       extension: 'jpg',
       lastModified: new Date(),
     },
+    {
+      id: 'file-3',
+      name: 'notes.txt',
+      type: 'file',
+      parentId: 'folder-1',
+      size: 512,
+      extension: 'txt',
+      lastModified: new Date(),
+    },
+    {
+      id: 'folder-3',
+      name: 'Projects',
+      type: 'folder',
+      parentId: 'folder-1',
+      lastModified: new Date(),
+    },
+    {
+      id: 'file-4',
+      name: 'project-plan.pdf',
+      type: 'file',
+      parentId: 'folder-3',
+      size: 3072,
+      extension: 'pdf',
+      lastModified: new Date(),
+    },
+    {
+      id: 'file-5',
+      name: 'background.png',
+      type: 'file',
+      parentId: 'folder-2',
+      size: 4096,
+      extension: 'png',
+      lastModified: new Date(),
+    },
   ]);
 
   const [currentFolderId, setCurrentFolderId] = useState<string>('root');
@@ -93,7 +127,10 @@ export const useFileSystem = () => {
       type,
       parentId,
       lastModified: new Date(),
-      ...(type === 'file' && { size: 0, extension: name.split('.').pop() }),
+      ...(type === 'file' && { 
+        size: 0, 
+        extension: name.includes('.') ? name.split('.').pop() : undefined 
+      }),
     };
     
     setItems(prev => [...prev, newItem]);
@@ -101,12 +138,16 @@ export const useFileSystem = () => {
   }, []);
 
   const renameItem = useCallback((id: string, newName: string) => {
+    if (!newName.trim()) return;
+    
     setItems(prev => prev.map(item => 
       item.id === id 
         ? { 
             ...item, 
             name: newName,
-            ...(item.type === 'file' && { extension: newName.split('.').pop() })
+            ...(item.type === 'file' && { 
+              extension: newName.includes('.') ? newName.split('.').pop() : item.extension 
+            })
           }
         : item
     ));
