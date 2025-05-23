@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { File, Folder } from 'lucide-react';
 import { FileItem as FileItemType } from '@/types/FileSystem';
@@ -75,6 +76,7 @@ export const FileItemComponent = ({
 
   return (
     <div
+      data-item-id={item.id}
       className={cn(
         "flex flex-col items-center p-3 m-1 rounded-lg cursor-pointer select-none transition-colors group",
         "hover:bg-blue-50 hover:border-blue-200",

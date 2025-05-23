@@ -50,6 +50,7 @@ export const FileListView = ({
           {items.map((item) => (
             <tr
               key={item.id}
+              data-item-id={item.id}
               className={cn(
                 "hover:bg-blue-50 cursor-pointer border-b",
                 selectedItems.has(item.id) && "bg-blue-100"
