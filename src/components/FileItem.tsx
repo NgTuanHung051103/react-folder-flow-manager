@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { File, Folder } from 'lucide-react';
 import { FileItem as FileItemType } from '@/types/FileSystem';
@@ -44,6 +43,7 @@ export const FileItemComponent = ({
   };
 
   const handleDragOver = (e: React.DragEvent) => {
+    // Only allow drop if the item is a folder
     if (item.type === 'folder') {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
@@ -51,6 +51,7 @@ export const FileItemComponent = ({
   };
 
   const handleDrop = (e: React.DragEvent) => {
+    // Only process drop if this is a folder
     if (item.type === 'folder') {
       e.preventDefault();
       e.stopPropagation();

@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { FileItem, ClipboardData } from '@/types/FileSystem';
 
@@ -109,6 +108,13 @@ export const useFileSystem = () => {
   }, [getItemById]);
 
   const moveItems = useCallback((itemIds: string[], targetFolderId: string) => {
+    // Verify target is a folder before proceeding
+    const targetItem = getItemById(targetFolderId);
+    if (!targetItem || targetItem.type !== 'folder') {
+      console.log(`Invalid target: ${targetFolderId}. Target must be a folder.`);
+      return; // Cancel the operation if target is not a folder
+    }
+    
     console.log(`Moving items [${itemIds.join(', ')}] to folder: ${targetFolderId}`);
     
     setItems(prev => prev.map(item => 
@@ -118,7 +124,7 @@ export const useFileSystem = () => {
     ));
     
     setSelectedItems(new Set());
-  }, []);
+  }, [getItemById]);
 
   const createItem = useCallback((name: string, type: 'file' | 'folder', parentId: string) => {
     const newItem: FileItem = {

@@ -41,6 +41,7 @@ export const FolderTree = ({
   };
 
   const handleDragOver = (e: React.DragEvent) => {
+    // We only allow dropping into folders in the tree view
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };

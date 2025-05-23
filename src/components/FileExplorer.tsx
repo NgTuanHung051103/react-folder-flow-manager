@@ -143,6 +143,17 @@ export const FileExplorer = () => {
   };
 
   const handleDrop = (targetFolderId: string, draggedItemIds: string[]) => {
+    // Validate the target is a folder
+    const targetItem = getItemById(targetFolderId);
+    if (!targetItem || targetItem.type !== 'folder') {
+      toast({
+        title: "Invalid Operation",
+        description: "Items can only be dropped into folders",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Don't allow dropping into self or children
     if (draggedItemIds.includes(targetFolderId)) {
       toast({
@@ -209,7 +220,17 @@ export const FileExplorer = () => {
     e.preventDefault();
     try {
       const data = JSON.parse(e.dataTransfer.getData('application/json'));
-      handleDrop(currentFolderId, data.itemIds);
+      // Only process drop if current folder is a valid destination
+      const currentFolder = getItemById(currentFolderId);
+      if (currentFolder && currentFolder.type === 'folder') {
+        handleDrop(currentFolderId, data.itemIds);
+      } else {
+        toast({
+          title: "Invalid Operation",
+          description: "Items can only be dropped into folders",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error('Error parsing drag data:', error);
     }
